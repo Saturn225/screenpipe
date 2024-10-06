@@ -157,12 +157,11 @@ jobs:
           fi
           cargo build --release ${{ matrix.args }}
 
-      - name: Upload build artifacts
-        if: matrix.platform == 'macos-latest' && matrix.args == '--target aarch64-apple-darwin --features metal'
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: ./target/aarch64-apple-darwin/release/screenpipe
+      - name: Install Chocolatey
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; `
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
       - name: Install Dependencies for V8 Build (Windows)
         run: |
@@ -177,7 +176,12 @@ jobs:
           RUST_BACKTRACE: 1
         run: |
           cargo build --release --target ${{ matrix.target }}
-
+      - name: Upload build artifacts
+        if: matrix.platform == 'macos-latest' && matrix.args == '--target aarch64-apple-darwin --features metal'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ./target/aarch64-apple-darwin/release/screenpipe
       - name: Upload build artifacts for Windows ARM64
         if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
         uses: actions/upload-artifact@v3
