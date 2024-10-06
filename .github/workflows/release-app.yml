@@ -85,16 +85,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-brew-
 
-      - name: Cache Pre Build
-        id: cache-pre-build
-        uses: actions/cache@v4
-        with:
-          path: |
-            screenpipe-app-tauri/src-tauri/openblas
-            screenpipe-app-tauri/src-tauri/clblast
-            screenpipe-app-tauri/src-tauri/ffmpeg
-            screenpipe-app-tauri/src-tauri/tesseract-*
-          key: ${{ matrix.platform }}-${{ matrix.args }}-pre-build
+      # - name: Cache Pre Build
+      #   id: cache-pre-build
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       screenpipe-app-tauri/src-tauri/openblas
+      #       screenpipe-app-tauri/src-tauri/clblast
+      #       screenpipe-app-tauri/src-tauri/ffmpeg
+      #       screenpipe-app-tauri/src-tauri/tesseract-*
+      #     key: ${{ matrix.platform }}-${{ matrix.args }}-pre-build
 
       - uses: actions/cache@v3
         with:
