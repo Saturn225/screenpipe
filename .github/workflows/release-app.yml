@@ -146,29 +146,29 @@ jobs:
             exit 1
           }
           
-      - name: Install Chocolatey
-        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
-        shell: pwsh
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force;
-          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
-          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+      # - name: Install Chocolatey
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   shell: pwsh
+      #   run: |
+      #     Set-ExecutionPolicy Bypass -Scope Process -Force;
+      #     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+      #     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-      - name: Install Dependencies for V8 Build (Windows)
-        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
-        run: |
-          choco install ninja --retry=3 
-          choco install python --version 3.9 --retry=3
-          curl https://sh.rustup.rs -sSf | sh -s -- -y
+      # - name: Install Dependencies for V8 Build (Windows)
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   run: |
+      #     choco install ninja --retry=3 
+      #     choco install python --version 3.9 --retry=3
+      #     curl https://sh.rustup.rs -sSf | sh -s -- -y
 
-      - name: Clone GN Repository for Windows ARM64
-        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
-        run: |
-          git clone https://gn.googlesource.com/gn
-          cd gn
-          python3 build/gen.py
-          mkdir -p out/Release
-          ninja -C out/Release
+      # - name: Clone GN Repository for Windows ARM64
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   run: |
+      #     git clone https://gn.googlesource.com/gn
+      #     cd gn
+      #     python3 build/gen.py
+      #     mkdir -p out/Release
+      #     ninja -C out/Release
 
       - name: Force V8 Build from Source
         if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
