@@ -146,7 +146,6 @@ jobs:
             exit 1
           }
           
-          
       - name: Install Chocolatey
         if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
         shell: pwsh
@@ -168,6 +167,7 @@ jobs:
           git clone https://gn.googlesource.com/gn
           cd gn
           python3 build/gen.py
+          mkdir -p out/Release
           ninja -C out/Release
 
       - name: Force V8 Build from Source
