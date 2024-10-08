@@ -146,13 +146,6 @@ jobs:
             exit 1
           }
           
-      - name: Clone GN Repository for Windows ARM64
-        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
-        run: |
-          git clone https://gn.googlesource.com/gn
-          cd gn
-          python3 build/gen.py
-          ninja -C out/Release
           
       - name: Install Chocolatey
         if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
@@ -169,6 +162,13 @@ jobs:
           choco install python --version 3.9 --retry=3
           curl https://sh.rustup.rs -sSf | sh -s -- -y
 
+      - name: Clone GN Repository for Windows ARM64
+        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+        run: |
+          git clone https://gn.googlesource.com/gn
+          cd gn
+          python3 build/gen.py
+          ninja -C out/Release
 
       - name: Force V8 Build from Source
         if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
