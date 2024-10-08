@@ -45,6 +45,10 @@ jobs:
             args: "--target x86_64-pc-windows-msvc" # TODO CUDA, mkl?  --features "openblas"
             pre-build-args: "" # --openblas
           # windows arm: https://github.com/ahqsoftwares/tauri-ahq-store/blob/2fbc2103c222662b3c6ee0cd71fcde664824f0ef/.github/workflows/publish.yml#L136
+          - platform: "windows-latest" # Windows ARM64
+            args: "--target aarch64-pc-windows-msvc"
+            target: aarch64-pc-windows-msvc
+            pre-build-args: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -141,7 +145,39 @@ jobs:
             Write-Error "Tesseract is not properly installed or not in PATH"
             exit 1
           }
+          
+      # - name: Install Chocolatey
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   shell: pwsh
+      #   run: |
+      #     Set-ExecutionPolicy Bypass -Scope Process -Force;
+      #     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+      #     iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
+      # - name: Install Dependencies for V8 Build (Windows)
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   run: |
+      #     choco install ninja --retry=3 
+      #     choco install python --version 3.9 --retry=3
+      #     curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+      # - name: Clone GN Repository for Windows ARM64
+      #   if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+      #   run: |
+      #     git clone https://gn.googlesource.com/gn
+      #     cd gn
+      #     python3 build/gen.py
+      #     mkdir -p out/Release
+      #     ninja -C out/Release
+
+      - name: Force V8 Build from Source
+        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+        env:
+          V8_FROM_SOURCE: 1
+          RUST_BACKTRACE: 1
+        run: |
+          cargo build --release --target ${{ matrix.target }}
+          
       - name: Build CLI
         shell: bash
         run: |
@@ -152,14 +188,19 @@ jobs:
             export V8_FLAGS="--max-old-space-size=8192" # https://github.com/denoland/deno_core/issues/916
           fi
           cargo build --release ${{ matrix.args }}
-
+          
       - name: Upload build artifacts
         if: matrix.platform == 'macos-latest' && matrix.args == '--target aarch64-apple-darwin --features metal'
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
           path: ./target/aarch64-apple-darwin/release/screenpipe
-
+      - name: Upload build artifacts for Windows ARM64
+        if: matrix.platform == 'windows-latest' && matrix.args == '--target aarch64-pc-windows-msvc'
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-arm64-artifacts
+          path: ./target/aarch64-pc-windows-msvc/release
       # - name: Setup tmate session
       #   uses: mxschmitt/action-tmate@v3
 
